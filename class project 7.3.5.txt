@@ -1,0 +1,56 @@
+import requests, json
+from pprint import pprint
+#Define apiKey and url
+api_key = "b6832ac05d6bcd5db304ea64c5cf6d1e"
+url = "http://api.openweathermap.org/data/2.5/weather"
+headers ={
+    'cache-control': "no-cache",
+}
+#Looking weather up by city
+def get_by_city (city):
+    querystring = {"q": city + ",us", "units": "imperial", "APPID": api_key}
+    try:
+        response = requests.request("GET", url, headers = headers, params = querystring)
+    except requests.exceptions.RequestException as e:
+        print (e)
+    parseWeather (response)
+#Looking weather up by zip
+def get_by_zip (zip):
+    querystring = {"zip": zip + ",us", "units": "imperial", "APPID": api_key}
+    try:
+      response = requests.request("GET", url, headers = headers, params = querystring)
+    except requests.exceptions.RequestException as e:
+        print (e)
+    #print (response.url)
+    #print (response.text)
+    parseWeather(response)
+def parseWeather (response):
+    weatherJSON = response.json()    
+    temp = weatherJSON ['main']['temp']
+    maxTemp = weatherJSON ['main']['temp_max']
+    minTemp = weatherJSON ['main']['temp_min']
+    humidity = weatherJSON ['main']['humidity']
+    print("\nCurrent Weather Conditions for " + weatherJSON['name'])
+    print("Current Temperature:" + str(temp) + "degrees")
+    print ("High Temperature:" + str(maxTemp) + "degees")
+    print ("Low Temperature:" + str(minTemp) + "degrees")
+    print("Humidity:" + str(humidity) + "&")
+#Define the main method to gather user input
+def main ():
+    runApp = True
+    #Allowing the user to run multiple times
+    while runApp:
+        lookupType = input("\nWould you like to enter city name or zip code? Enter 1 for city and 2 for zip:")
+        if (lookupType == '1'):
+            city = input('Plese enter the city name:')
+            get_by_city(city)
+        elif (lookupType == '2'):
+            zip = input('Please enter the zip code:')
+            get_by_zip(zip)
+        else:
+            print('Invalid selection. Please enter 1 for city name or 2 for zip code')
+        runApp = input("\nWould you like to perform another search? (Y/N):").lower()
+        if runApp in 'n':
+            break
+if __name__ == "__main__":
+    main()
